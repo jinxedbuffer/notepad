@@ -1,6 +1,7 @@
 package com.jinxedbuffer.notepad
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -22,13 +23,15 @@ import com.google.android.material.color.DynamicColors
 class MainActivity : AppCompatActivity() {
 
     private var currentlyOpenedFileUri: Uri? = null
-    private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let {
-            currentlyOpenedFileUri = it
-            val text = readFromUri(it)
-            findViewById<EditText>(R.id.textfield).setText(text)
-            Toast.makeText(this, "Opened ${getFileNameFromUri(this, it)}", Toast.LENGTH_SHORT).show()
-
+    private val getContent = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val uri = result.data?.data
+            uri?.let {
+                currentlyOpenedFileUri = it
+                val text = readFromUri(it)
+                findViewById<EditText>(R.id.textfield).setText(text)
+                Toast.makeText(this, "Opened ${getFileNameFromUri(this, it)}", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -47,6 +50,15 @@ class MainActivity : AppCompatActivity() {
         // start cursor blink
         val editText = findViewById<EditText>(R.id.textfield)
         editText.requestFocus()
+
+        // get intent that started this activity
+        val i = intent
+        if (Intent.ACTION_VIEW == i.action) {
+            val uri = i.data
+            uri?.let {
+                editText.setText(readFromUri(uri))
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -61,9 +73,15 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.action_save_file -> {
+                if (currentlyOpenedFileUri == null) {
+                    saveAsFile()
+                } else {
+                    saveFile(currentlyOpenedFileUri!!)
+                }
                 true
             }
             R.id.action_save_as -> {
+                saveAsFile()
                 true
             }
             R.id.action_settings -> {
@@ -74,7 +92,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openFile() {
-        getContent.launch("*/*")
+        val i = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+        }
+        getContent.launch(i)
+    }
+
+    private fun saveFile(uri: Uri) {
+        grantUriPermission("com.jinxedbuffer.notepad", uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        contentResolver.openOutputStream(uri).use { outputStream ->
+            val text = findViewById<EditText>(R.id.textfield).text.toString()
+            outputStream?.write(text.toByteArray())
+        }
+        Toast.makeText(this, "Saved ${getFileNameFromUri(this, uri)}", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun saveAsFile() {
     }
 
     private fun readFromUri(uri: Uri?): String? {
@@ -87,7 +121,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @SuppressLint("Range")
-    fun getFileNameFromUri(context: Context, uri: Uri?): String? {
+    private fun getFileNameFromUri(context: Context, uri: Uri?): String? {
         val cursor = uri?.let {
             context.contentResolver.query(it, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
         }
@@ -96,4 +130,6 @@ class MainActivity : AppCompatActivity() {
             it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
         }
     }
+
+    private fun getStoragePermission() {}
 }
