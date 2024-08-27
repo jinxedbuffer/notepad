@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+        <item
+            android:id="@+id/action_open_file"
+            android:icon="@drawable/file_open_icon"
+            android:title="Open File"
+            app:iconTint="?attr/colorOnSurface"
+            app:showAsAction="ifRoom" />
+
+        <item
+            android:id="@+id/action_save_file"
+            android:icon="@drawable/save_icon"
+            android:title="Save"
+            app:iconTint="?attr/colorOnSurface"
+            app:showAsAction="ifRoom"/>
+
+        <item
+            android:id="@+id/action_save_as"
+            android:icon="@drawable/save_as_icon"
+            android:title="Save As"
+            app:iconTint="?attr/colorOnSurface"
+            app:showAsAction="ifRoom" />
+
+        <item android:id="@+id/action_settings"
+            android:title="Settings"
+            app:showAsAction="never"/>
+
+</menu>

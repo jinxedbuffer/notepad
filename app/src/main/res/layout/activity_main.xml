@@ -17,20 +17,29 @@
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/Theme.AppCompat.Light" />
 
+    <View
+        android:id="@+id/toolbar_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/colorOnSurface"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        tools:layout_editor_absoluteX="58dp" />
+
     <EditText
         android:id="@+id/textfield"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/transparent"
         android:layout_marginTop="50dp"
-        android:gravity="start"
-        android:layerType="software"
-        android:inputType="textMultiLine"
-        android:padding="8dp"
-        android:scrollbars="vertical"
+        android:background="@android:color/transparent"
         android:focusable="true"
-        android:overScrollMode="never"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        android:gravity="top"
+        android:inputType="textMultiLine"
+        android:layerType="software"
+        android:overScrollMode="always"
+        android:padding="12dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_divider"
         tools:layout_editor_absoluteX="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
